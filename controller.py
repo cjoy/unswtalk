@@ -21,6 +21,8 @@ def GetUserPosts(zid):
         reply_files = glob.glob(post.split('.txt')[0]+'-[0-9].txt')
         for reply in reply_files:
             print(" ", reply)
+            reply_files = glob.glob(post.split('.txt')[0]+'-[0-9].txt')
+
         # with open(post) as f:
         #     posts.append(yaml.load(f.read()))
 
