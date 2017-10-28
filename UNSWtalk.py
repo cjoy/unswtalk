@@ -20,6 +20,17 @@ def start():
     return redirect('/feeds')
 
 
+@app.route('/feeds', methods=['GET','POST'])
+def feeds():
+    # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect('/login')
+
+    feeds = ctrl.GetUserFeeds(session['zid'])
+    return render_template('feeds.html', title="My Feeds", feeds=feeds,
+        getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
+        parseTime=ctrl.parseTime)
+
 
 @app.route('/search/people', methods=['GET','POST'])
 def search_people():
@@ -62,6 +73,8 @@ def profile(zid):
 
 @app.route('/login', methods=['GET','POST'])
 def login():
+    # test function
+    feeds = ctrl.GetUserFeeds('z5195935')
 
     # error status is set to true
     status = True
@@ -75,7 +88,7 @@ def login():
             session['logged_in'] = True
             session['zid'] = zid
             session['user_details'] = ctrl.GetUserDetails(zid)
-            return redirect('/profile/'+zid)
+            return redirect('/')
         else:
             status = False
 

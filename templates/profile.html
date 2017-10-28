@@ -12,7 +12,7 @@
                 <div class="col-4">
                     <!-- <img style="border-radius:50%; width:170px; background-color:white" src="{{ GetProfilePic(student_details['zid']) }}"></img> -->
                     <img style="border-radius:50%; width:170px; background-color:white" 
-                        src="/{{ GetProfilePic(student_details['zid']) }}"></img>
+                        src="{{ GetProfilePic(student_details['zid']) }}"></img>
                 </div>
                 <div class="col-8">
                     <h2>{{student_details['full_name']}}</h2>
@@ -54,11 +54,11 @@
                         <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
                             <a href="">
                                 <img class="mx-auto rounded-circle img-fluid" 
-                                src="/{{ GetProfilePic(post.content.from) }}" 
+                                src="{{ GetProfilePic(post.content._from) }}" 
                                 alt="avatar"></a>
                         </div>
                         <div class="comment-content col-md-11 col-sm-10">
-                            <h6 class="small comment-meta"><a href="/profile/{{ post.content.from }}">{{ getdetails(post.content.from).full_name }}</a> {{ parseTime(post.content.time) }}</h6>
+                            <h6 class="small comment-meta"><a href="/profile/{{ post.content._from }}">{{ getdetails(post.content._from).full_name }}</a> {{ parseTime(post.content.time) }}</h6>
                             <div class="comment-body">
                                 <p>
                                     {{ post.content.message }}
@@ -74,11 +74,11 @@
                             <div class="row">
                                 <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
                                     <a href=""><img class="mx-auto rounded-circle img-fluid" 
-                                        src="/{{ GetProfilePic(comment.content.from) }}" 
+                                        src="{{ GetProfilePic(comment.content._from) }}" 
                                         alt="avatar"></a>
                                 </div>
                                 <div class="comment-content col-md-11 col-sm-10 col-12">
-                                    <h6 class="small comment-meta"><a href="/profile/{{ comment.content.from }}">{{ getdetails(comment.content.from).full_name }}</a> {{ parseTime(comment.content.time) }}</h6>
+                                    <h6 class="small comment-meta"><a href="/profile/{{ comment.content._from }}">{{ getdetails(comment.content._from).full_name }}</a> {{ parseTime(comment.content.time) }}</h6>
                                     <div class="comment-body">
                                         <p>{{ comment.content.message }}
                                             <br>
@@ -94,11 +94,11 @@
                                 <div class="row">
                                     <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
                                         <a href=""><img class="mx-auto rounded-circle img-fluid"
-                                            src="/{{ GetProfilePic(reply.content.from) }}" 
+                                            src="{{ GetProfilePic(reply.content._from) }}" 
                                             alt="avatar"></a>
                                     </div>
                                     <div class="comment-content col-md-11 col-sm-10 col-12">
-                                        <h6 class="small comment-meta"><a href="/profile/{{ reply.content.from }}">{{ getdetails(reply.content.from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
+                                        <h6 class="small comment-meta"><a href="/profile/{{ reply.content._from }}">{{ getdetails(reply.content._from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
                                         <div class="comment-body">
                                             <p>{{ reply.content.message }}
                                                 <br>
@@ -141,7 +141,7 @@
                 {% for friend in friends %}
                 <div class="mdl-cell mdl-cell--4-col  mdl-card mdl-shadow--2dp" style="width:200px">
                     <a href="/profile/{{ friend }}">
-                    <img class="card-img-top" style="width:100%" src="/{{ GetProfilePic(friend) }}" alt="Card image cap">
+                    <img class="card-img-top" style="width:100%" src="{{ GetProfilePic(friend) }}" alt="Card image cap">
                     <div class="card-block">
                         <h4 class="card-title">{{ getdetails(friend)['full_name'] }}</h4>
                     </div>
