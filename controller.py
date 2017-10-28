@@ -31,6 +31,8 @@ def literalFile(content):
     content = re.sub(':','',content)
     return content
 
+
+
 # TODO: parse datatime (for posts etc)
 def parseTime(tstamp):
     return tstamp
@@ -54,6 +56,24 @@ def GetUserDetails(zid):
             details = yaml.load(f.read())
     return details
 
+
+# Parse message helper - Replace ZID with Full Name
+def helper_name_replace(match):
+    zid = match.group()
+    user_details = GetUserDetails(zid)
+    url = '<a href="/profile/'+zid+'">' + zid + '</a>'
+    if 'full_name' in user_details:
+        url = '<a href="/profile/'+zid+'">' + user_details['full_name'] + '</a>'
+    return url
+
+# Parse messages (friends tagging and html in comments)
+def ParseMessage(message):
+    try:
+        message = re.sub(r'(z[0-9]+)', helper_name_replace, message)
+        message = message.replace('\\n', '<br>')
+    except:
+        message = message
+    return message
 
 # Get all users (array of user objects returned)
 def GetAllUsers():

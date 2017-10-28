@@ -29,7 +29,7 @@ def feeds():
     feeds = ctrl.GetUserFeeds(session['zid'])
     return render_template('feeds.html', title="My Feeds", feeds=feeds,
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
-        parseTime=ctrl.parseTime)
+        parseTime=ctrl.parseTime, ParseMessage=ctrl.ParseMessage)
 
 
 @app.route('/search/people', methods=['GET','POST'])
@@ -67,14 +67,14 @@ def profile(zid):
     return render_template('profile.html', title=details['full_name'],
         student_details=details, posts=reversed(posts),
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
-        parseTime=ctrl.parseTime,
+        parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage,
         courses=courses, friends=friends)
 
 
 @app.route('/login', methods=['GET','POST'])
 def login():
     # test function
-    feeds = ctrl.GetUserFeeds('z5195935')
+    # feeds = ctrl.GetUserFeeds('z5195935')
 
     # error status is set to true
     status = True

@@ -19,11 +19,14 @@
             <div class="comment-content col-md-11 col-sm-10">
                 <h6 class="small comment-meta"><a href="/profile/{{ post.content._from }}">{{ getdetails(post.content._from).full_name }}</a> {{ parseTime(post.content.time) }}</h6>
                 <div class="comment-body">
+                    {% if post.content.message %}                        
                     <p>
-                        {{ post.content.message }}
+                        {{ ParseMessage(post.content.message)|safe }}
                         <br>
                         <a href="" class="text-right small"><i class="ion-reply"></i> Reply</a>
                     </p>
+                    {% endif %}
+                    
                 </div>
             </div>
                 
@@ -39,10 +42,12 @@
                     <div class="comment-content col-md-11 col-sm-10 col-12">
                         <h6 class="small comment-meta"><a href="/profile/{{ comment.content._from }}">{{ getdetails(comment.content._from).full_name }}</a> {{ parseTime(comment.content.time) }}</h6>
                         <div class="comment-body">
-                            <p>{{ comment.content.message }}
+                            {% if comment.content.message %}
+                            <p>{{ ParseMessage(comment.content.message)|safe  }}
                                 <br>
                                 <a href="" class="text-right small"><i class="ion-reply"></i> Reply</a>
                             </p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -59,10 +64,12 @@
                         <div class="comment-content col-md-11 col-sm-10 col-12">
                             <h6 class="small comment-meta"><a href="/profile/{{ reply.content._from }}">{{ getdetails(reply.content._from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
                             <div class="comment-body">
-                                <p>{{ reply.content.message }}
+                                {% if post.content.message %}                    
+                                <p>{{ ParseMessage(reply.content.message)|safe }}
                                     <br>
                                     <a href="" class="text-right small"><i class="ion-reply"></i> Reply</a>
                                 </p>
+                                {% endif %}                                
                             </div>
                         </div>
                     </div>
