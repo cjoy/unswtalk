@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block body_contents %}
+
+
+<div class="demo-card-wide mdl-card mdl-shadow--2dp" style="width:100%">
+    <div class="mdl-card__title"
+        style="background:url(http://www.googlecover.com/_asset/_cover/Bokeh-Light_739.jpg) center/cover; height:350px">
+
+        <div class="mdl-card__title-text mdl-card__title-text-shade" style="width:625px">
+            <div class="row">
+                <div class="col-4">
+                    <!-- <img style="border-radius:50%; width:170px; background-color:white" src="{{ GetProfilePic(student_details['zid']) }}"></img> -->
+                    <img style="border-radius:50%; width:170px; background-color:white" 
+                        src="/{{ GetProfilePic(student_details['zid']) }}"></img>
+                </div>
+                <div class="col-8">
+                    <h2>{{student_details['full_name']}}</h2>
+                    <small style="font-size:10"><i class="fa fa-book" aria-hidden="true"></i> {{student_details['program']}}</small>
+                    <br><small style="font-size:10"><i class="fa fa-map-marker" aria-hidden="true"></i> {{student_details['home_suburb']}}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mdl-card__menu">
+    </div>
+</div>
+<br>
+<!-- Nav tabs -->
+<div style="padding:30px">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#posts" role="tab">{{student_details['full_name']}}'s Posts</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#friends" role="tab">Friends</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#about" role="tab">Courses</a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="posts" role="tabpanel">
+
+            {% for post in posts %}
+            <div class="mdl-card mdl-shadow--2dp" style="width:100%; padding: 40px; margin-bottom:40px">
+                
+            <div class="row">
+                <div class="comments col-md-9" id="comments">
+                    <!-- post -->
+                    <div class="comment mb-2 row">
+                        <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
+                            <a href="">
+                                <img class="mx-auto rounded-circle img-fluid" 
+                                src="/{{ GetProfilePic(post.content.from) }}" 
+                                alt="avatar"></a>
+                        </div>
+                        <div class="comment-content col-md-11 col-sm-10">
+                            <h6 class="small comment-meta"><a href="/profile/{{ post.content.from }}">{{ getdetails(post.content.from).full_name }}</a> {{ parseTime(post.content.time) }}</h6>
+                            <div class="comment-body">
+                                <p>
+                                    {{ post.content.message }}
+                                    <br>
+                                    <a href="" class="text-right small"><i class="ion-reply"></i> Reply</a>
+                                </p>
+                            </div>
+                        </div>
+                            
+                        <!-- comment is indented -->
+                        {% for comment in post.comments %}
+                        <div class="comment-reply col-md-11 offset-md-1 col-sm-10 offset-sm-2">
+                            <div class="row">
+                                <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
+                                    <a href=""><img class="mx-auto rounded-circle img-fluid" 
+                                        src="/{{ GetProfilePic(comment.content.from) }}" 
+                                        alt="avatar"></a>
+                                </div>
+                                <div class="comment-content col-md-11 col-sm-10 col-12">
+                                    <h6 class="small comment-meta"><a href="/profile/{{ comment.content.from }}">{{ getdetails(comment.content.from).full_name }}</a> {{ parseTime(comment.content.time) }}</h6>
+                                    <div class="comment-body">
+                                        <p>{{ comment.content.message }}
+                                            <br>
+                                            <a href="" class="text-right small"><i class="ion-reply"></i> Reply</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- reply is indented -->
+                            {% for reply in comment.replies %}
+                            <div class="comment-reply col-md-11 offset-md-1 col-sm-10 offset-sm-2">
+                                <div class="row">
+                                    <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
+                                        <a href=""><img class="mx-auto rounded-circle img-fluid"
+                                            src="/{{ GetProfilePic(reply.content.from) }}" 
+                                            alt="avatar"></a>
+                                    </div>
+                                    <div class="comment-content col-md-11 col-sm-10 col-12">
+                                        <h6 class="small comment-meta"><a href="/profile/{{ reply.content.from }}">{{ getdetails(reply.content.from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
+                                        <div class="comment-body">
+                                            <p>{{ reply.content.message }}
+                                                <br>
+                                                <a href="" class="text-right small"><i class="ion-reply"></i> Reply</a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                                
+                            {% endfor %}                            
+                            <!-- /reply is indented -->
+
+
+
+                        </div>
+                        {% endfor %}                            
+                        <!-- /comment is indented -->
+
+                    </div>
+
+                </div>            
+            </div>
+            </div>
+            {% endfor %}
+            
+
+        </div>
+
+        <div class="tab-pane" id="about" role="tabpanel">
+            <br><b>{{student_details['full_name']}}'s Courses</b>
+                {% for course in courses %}
+                    <li>{{ course }}</li>
+                {% endfor %}
+        </div>
+
+
+        <div class="tab-pane" id="friends" role="tabpanel">
+
+            <div class="mdl-grid">                    
+                {% for friend in friends %}
+                <div class="mdl-cell mdl-cell--4-col  mdl-card mdl-shadow--2dp" style="width:200px">
+                    <a href="/profile/{{ friend }}">
+                    <img class="card-img-top" style="width:100%" src="/{{ GetProfilePic(friend) }}" alt="Card image cap">
+                    <div class="card-block">
+                        <h4 class="card-title">{{ getdetails(friend)['full_name'] }}</h4>
+                    </div>
+                    </a>
+                </div>   
+                {% endfor %}
+            </div>
+        
+        </div>
+            
+
+    </div>
+
+</div>
+        
+
+{% endblock %}
