@@ -19,93 +19,6 @@ def start():
 
     return redirect(url_for('feeds'))
 
-
-
-# DELETE FRIEND
-@app.route('/friend/delete', methods=['POST', 'GET'])
-def delete_friend():
-    # # protected route - check if user logged in
-    if 'logged_in' not in session:
-        return redirect(url_for('login'))
-    # post error handlr
-    post = True
-    try:
-         friend = request.form.get('friend')
-         zid = session['zid']
-    except:
-        post = False
-
-    if post == True:
-        ctrl.AddDeleteFriend('delete', zid, friend)
-
-    return redirect(url_for('profile',zid=session['zid']))
-
-# ADD FRIEND
-@app.route('/friend/add', methods=['POST', 'GET'])
-def add_friend():
-    # # protected route - check if user logged in
-    if 'logged_in' not in session:
-        return redirect(url_for('login'))
-    # post error handlr
-    post = True
-    try:
-         friend = request.form.get('friend')
-         zid = session['zid']
-    except:
-        post = False
-
-    if post == True:
-        ctrl.AddDeleteFriend('add', zid, friend)
-
-    return redirect(url_for('profile',zid=session['zid']))
-
-# POST COMMENT ROUTE
-@app.route('/post/delete', methods=['POST', 'GET'])
-def delete_comment():
-    # protected route - check if user logged in
-    if 'logged_in' not in session:
-        return redirect(url_for('login'))
-    # post error handlr bool
-    post = True
-    try:
-        addr = request.form.get('addr')
-    except:
-        post = False
-    if post == True:
-        ctrl.DeletePost(addr)
-
-    return redirect(url_for('profile',zid=session['zid']))
-
-
-
-# POST COMMENT ROUTE
-@app.route('/post/comment', methods=['POST', 'GET'])
-def new_comment():
-    # protected route - check if user logged in
-    if 'logged_in' not in session:
-        return redirect(url_for('login'))
-    # post error handlr bool
-    post = True
-    try:
-        parent = request.form.get('parent')
-        content = request.form.get('content')
-        zid = session['zid']
-    except:
-        post = False
-    if post == True:
-        ctrl.MakeCommentPost(parent, content, zid)
-    return redirect(url_for('profile',zid=session['zid']))
-
-# POST ROUTE
-@app.route('/post', methods=['POST', 'GET'])
-def new_post():
-    # protected route - check if user logged in
-    if 'logged_in' not in session:
-        return redirect(url_for('login'))
-
-    ctrl.MakePost(request.form.get('post_content'), session['zid'])
-    return redirect(request.referrer)
-
 # FEEDS ROUTE
 @app.route('/feeds', methods=['GET','POST'])
 def feeds():
@@ -160,7 +73,6 @@ def search_posts():
         parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage, CleanID=ctrl.CleanID,
         results=results, query=query, RemoveStatic=ctrl.RemoveStatic)
 
-
 # PROFILE ROUTE
 @app.route('/profile/<zid>', methods=['GET','POST'])
 def profile(zid):
@@ -181,7 +93,6 @@ def profile(zid):
         parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage, CleanID=ctrl.CleanID,
         courses=courses, friends=friends, isFriend=ctrl.CheckFriend(session['zid'],zid),
         RemoveStatic=ctrl.RemoveStatic)
-
 
 # LOGIN ROUTE
 @app.route('/login', methods=['GET','POST'])
@@ -215,6 +126,100 @@ def logout():
     session.pop('zid', None)
     session.pop('user_details', None)
     return redirect(url_for('login'))
+
+
+
+
+
+
+
+# DELETE FRIEND
+@app.route('/friend/delete', methods=['POST', 'GET'])
+def delete_friend():
+    # # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    # post error handlr
+    post = True
+    try:
+         friend = request.form.get('friend')
+         zid = session['zid']
+    except:
+        post = False
+
+    if post == True:
+        ctrl.AddDeleteFriend('delete', zid, friend)
+
+    return redirect(request.referrer)
+
+# ADD FRIEND
+@app.route('/friend/add', methods=['POST', 'GET'])
+def add_friend():
+    # # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    # post error handlr
+    post = True
+    try:
+         friend = request.form.get('friend')
+         zid = session['zid']
+    except:
+        post = False
+
+    if post == True:
+        ctrl.AddDeleteFriend('add', zid, friend)
+
+    return redirect(request.referrer)
+
+# POST COMMENT ROUTE
+@app.route('/post/delete', methods=['POST', 'GET'])
+def delete_comment():
+    # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    # post error handlr bool
+    post = True
+    try:
+        addr = request.form.get('addr')
+    except:
+        post = False
+    if post == True:
+        ctrl.DeletePost(addr)
+
+    return redirect(request.referrer)
+
+
+
+# POST COMMENT ROUTE
+@app.route('/post/comment', methods=['POST', 'GET'])
+def new_comment():
+    # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    # post error handlr bool
+    post = True
+    try:
+        parent = request.form.get('parent')
+        content = request.form.get('content')
+        zid = session['zid']
+    except:
+        post = False
+    if post == True:
+        ctrl.MakeCommentPost(parent, content, zid)
+    return redirect(request.referrer)
+
+# POST ROUTE
+@app.route('/post', methods=['POST', 'GET'])
+def new_post():
+    # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+
+    ctrl.MakePost(request.form.get('post_content'), session['zid'])
+    return redirect(request.referrer)
+
+
+
 
 
 if __name__ == '__main__':

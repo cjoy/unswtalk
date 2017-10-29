@@ -7,8 +7,9 @@ from time import gmtime, strftime
 import time
 import operator
 import random
+import subprocess
 
-students_dir = "static/dataset-small";
+students_dir = "static/dataset-medium";
 
 # posts look-table up for faster searches
 posts_store = {}
@@ -29,6 +30,26 @@ class Post:
                     self.longitude = field[len('longitude: '):].rstrip()
                 if field.startswith('latitude:'):
                     self.latitude = field[len('latitude: '):].rstrip()
+
+
+# Mail Sender Helper
+# Credits - CSE Evan
+def send_email(to, subject, message):
+    mutt = [
+            'mutt',
+            '-s',
+            subject,
+            '-e', 'set copy=no',
+            '-e', 'set realname=UNSWtalk',
+            '--', to
+    ]
+    subprocess.run(
+            mutt,
+            input = message.encode('utf8'),
+            stderr = subprocess.PIPE,
+            stdout = subprocess.PIPE,
+    )
+
 
 # clean post and comment-ids
 # used for steralising jquery tags 
@@ -56,7 +77,7 @@ def parseTime(tstamp):
 
 # get user image
 def GetProfilePic(zid):
-    profile_pic = 'https://www.freeiconspng.com/uploads/profile-icon-9.png'
+    profile_pic = '/static/profile-icon.png'
     file_path = os.path.join(students_dir, zid, "img.jpg")
     if os.path.exists(file_path):
         profile_pic = '/' + file_path
@@ -333,6 +354,13 @@ def AddDeleteFriend(action, zid,friend):
         yaml.dump(target_obj, outfile, default_flow_style=False)
     with open(friend_dir, 'w') as outfile:
         yaml.dump(dest_obj, outfile, default_flow_style=False)
+
+    # send email notification
+    if action == 'add':
+        subject = "Friend Request"
+        message = "You have a new friend. Go to your UNSWtalk profile to accept the request."
+        send_email(GetUserDetails(zid)['email'],subject, message)
+        send_email(GetUserDetails(friend)['email'],subject, message)
         
     return
 
