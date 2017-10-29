@@ -31,14 +31,14 @@
                     <br><small style="font-size:10"><i class="fa fa-map-marker" aria-hidden="true"></i> {{student_details['home_suburb']}}</small>
                     
                     {% if zid != session['zid'] and isFriend == False %}
-                    <form style="width:20px; height:20px" type="submit" method="post" action="/friend/add">
+                    <form style="width:20px; height:20px" type="submit" method="post" action="{{url_for('add_friend')}}">
                         <input type="hidden" name="friend" value="{{zid}}"/>
                         <input type="hidden" name="callback" value="{{request.path}}"/>
                         <button type="submit" class="btn btn-success btn-lg"><i class="fa fa-plus" aria-hidden="true"></i> Add Friend </button>
                     </form>
                     {% endif %}
                     {% if zid != session['zid'] and isFriend == True %}
-                    <form style="width:20px; height:20px" type="submit" method="post" action="/friend/delete">
+                    <form style="width:20px; height:20px" type="submit" method="post" action="{{url_for('delete_friend')}}">
                         <input type="hidden" name="friend" value="{{zid}}"/>
                         <input type="hidden" name="callback" value="{{request.path}}"/>
                         <button type="submit" class="btn btn-danger btn-lg"><i class="fa fa-minus-circle" aria-hidden="true"></i> Pending - Unfriend</button>
@@ -74,7 +74,7 @@
         
         {% if zid == session['zid'] %}
         <div class="mdl-card mdl-shadow--2dp" style="width:100%; padding: 40px; margin-bottom:40px">
-            <form action="/post" method="post">
+            <form action="{{url_for('new_post')}}" method="post">
                 <input type="hidden" name="callback" value="{{request.path}}">                
                 <div class="row">
                     <div class="col-1">
@@ -101,13 +101,13 @@
                 <!-- post -->
                 <div class="comment mb-2 row">
                     <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
-                        <a href="">
+                        <a href="{{url_for('profile', zid=post.content._from)}}">
                             <img class="mx-auto rounded-circle img-fluid" 
                             src="{{ GetProfilePic(post.content._from) }}" 
                             alt="avatar"></a>
                     </div>
                     <div class="comment-content col-md-11 col-sm-10">
-                        <h6 class="small comment-meta"><a href="/profile/{{ post.content._from }}">{{ getdetails(post.content._from).full_name }}</a> {{ parseTime(post.content.time) }}</h6>
+                        <h6 class="small comment-meta"><a href="{{url_for('profile', zid=post.content._from)}}">{{ getdetails(post.content._from).full_name }}</a> {{ parseTime(post.content.time) }}</h6>
                         <div class="comment-body">
                             {% if post.content.message %}                        
                             <p>
@@ -124,7 +124,7 @@
                             </p>
                             <!-- Comment Box -->
                             <div class="comment-box" id="{{CleanID(post.id)}}">
-                                <form action="/post/comment" method="post">
+                                <form action="{{url_for('new_comment')}}" method="post">
                                     <div class="row">
                                         <input type="hidden" name="parent" value="{{post.id}}">
                                         <input type="hidden" name="callback" value="{{request.path}}">
@@ -154,12 +154,12 @@
                     <div class="comment-reply col-md-11 offset-md-1 col-sm-10 offset-sm-2">
                         <div class="row">
                             <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
-                                <a href=""><img class="mx-auto rounded-circle img-fluid" 
+                                <a href="{{url_for('profile', zid=comment.content._from)}}"><img class="mx-auto rounded-circle img-fluid" 
                                     src="{{ GetProfilePic(comment.content._from) }}" 
                                     alt="avatar"></a>
                             </div>
                             <div class="comment-content col-md-11 col-sm-10 col-12">
-                                <h6 class="small comment-meta"><a href="/profile/{{ comment.content._from }}">{{ getdetails(comment.content._from).full_name }}</a> {{ parseTime(comment.content.time) }}</h6>
+                                <h6 class="small comment-meta"><a href="{{url_for('profile', zid=comment.content._from)}}">{{ getdetails(comment.content._from).full_name }}</a> {{ parseTime(comment.content.time) }}</h6>
                                 <div class="comment-body">
                                     {% if comment.content.message %}
                                     <p>{{ ParseMessage(comment.content.message)|safe  }}
@@ -177,7 +177,7 @@
                                     </p>
                                     <!-- Comment Box -->
                                     <div class="comment-box" id="{{CleanID(comment.id)}}">
-                                        <form action="/post/comment" method="post">
+                                        <form action="{{url_for('new_comment')}}" method="post">
                                             <div class="row">
                                                 <input type="hidden" name="parent" value="{{comment.id}}">
                                                 <input type="hidden" name="callback" value="{{request.path}}">
@@ -208,12 +208,12 @@
                         <div class="comment-reply col-md-11 offset-md-1 col-sm-10 offset-sm-2">
                             <div class="row">
                                 <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
-                                    <a href=""><img class="mx-auto rounded-circle img-fluid"
+                                    <a href="{{url_for('profile', zid=reply.content._from)}}"><img class="mx-auto rounded-circle img-fluid"
                                         src="{{ GetProfilePic(reply.content._from) }}" 
                                         alt="avatar"></a>
                                 </div>
                                 <div class="comment-content col-md-11 col-sm-10 col-12">
-                                    <h6 class="small comment-meta"><a href="/profile/{{ reply.content._from }}">{{ getdetails(reply.content._from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
+                                    <h6 class="small comment-meta"><a href="{{url_for('profile', zid=reply.content._from)}}">{{ getdetails(reply.content._from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
                                     <div class="comment-body">
                                         {% if post.content.message %}                    
                                         <p>{{ ParseMessage(reply.content.message)|safe }}
@@ -264,19 +264,19 @@
 
                     {% if zid == session['zid'] %}
                     <div class="card-menu" style="margin-bottom:15px">
-                            <form style="width:20px; height:20px" type="submit" method="post" action="/friend/delete">
+                            <form style="width:20px; height:20px" type="submit" method="post" action="{{url_for('delete_friend')}}">
                                 <input type="hidden" name="friend" value="{{friend}}"/>
                                 <input type="hidden" name="callback" value="{{request.path}}#friends"/>
                                 <button type="submit" class="btn btn-info btn-sm"> Unfriend</button>
-                            </form>                                
+                            </form>
                     </div>
                     {% endif %}
 
-                    <a href="/profile/{{ friend }}">
+                    <a href="{{url_for('profile', zid=friend)}}">
                     <img class="card-img-top" style="width:100%" src="{{ GetProfilePic(friend) }}" alt="Card image cap">
                     <div class="card-block">
                         <h4 class="card-title">{{ getdetails(friend)['full_name'] }}</h4>
-                    </div>                        
+                    </div>
                     </a>
                 </div>
                 {% endfor %}

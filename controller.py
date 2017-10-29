@@ -69,9 +69,9 @@ def GetUserDetails(zid):
 def helper_name_replace(match):
     zid = match.group()
     user_details = GetUserDetails(zid)
-    url = '<a href="/profile/'+zid+'">' + zid + '</a>'
+    url = '<a href="'+url_for('profile',zid=zid)+'">' + zid + '</a>'
     if 'full_name' in user_details:
-        url = '<a href="/profile/'+zid+'">' + user_details['full_name'] + '</a>'
+        url = '<a href="'+url_for('profile',zid=zid)+'">' + user_details['full_name'] + '</a>'
     return url
 
 # Parse messages (friends tagging and html in comments)

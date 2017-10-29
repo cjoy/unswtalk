@@ -165,7 +165,7 @@ def search_posts():
 
     return render_template('search_posts.html', title='Search Posts - "' + query + '"', 
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
-        parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage,
+        parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage, CleanID=ctrl.CleanID,
         results=results, query=query)
 
 

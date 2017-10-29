@@ -37,7 +37,7 @@
                 <h2 class="mdl-card__title-text"><b>_</b>UNSW<b style="color:yellow">talk</b></h2>
             </div>
             <div class="mdl-card__supporting-text">
-                <form method="post" action="/login">
+                <form method="post" action="{{url_for('login')}}">
                     <div class="mdl-textfield mdl-js-textfield">
                         <input class="mdl-textfield__input" type="text" id="username" name="zid" placeholder="zID" />
                     </div>
@@ -45,7 +45,7 @@
                         <input class="mdl-textfield__input" type="password" name="password" id="userpass" placeholder="Password" />
                     </div>
                     <button class="btn btn-primary" style="width:100%; margin-bottom:10px" type="submit">Log in</button><br>
-                    <a class="btn btn-primary" style="width:100%" href="/register">Create an Account</a>
+                    <a class="btn btn-primary" style="width:100%" href="{{url_for('register')}}">Create an Account</a>
                 </form>
             </div>
         </div>

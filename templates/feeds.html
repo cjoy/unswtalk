@@ -4,7 +4,7 @@
 <div class="container">
 
 <div class="mdl-card mdl-shadow--2dp" style="width:100%; padding: 40px; margin-bottom:40px">
-    <form action="/post" method="post">
+    <form action="{{url_for('new_post')}}" method="post">
         <input type="hidden" name="callback" value="{{request.path}}">
         <div class="row">
             <div class="col-2">
@@ -40,24 +40,23 @@
 
 {% for post in feeds %}
 <div class="mdl-card mdl-shadow--2dp" style="width:100%; padding: 40px; margin-bottom:40px">
-    
+
 <div class="row">
     <div class="comments col-md-9" id="comments">
         <!-- post -->
         <div class="comment mb-2 row">
             <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
-                <a href="">
+                <a href="{{url_for('profile', zid=post.content._from)}}">
                     <img class="mx-auto rounded-circle img-fluid" 
                     src="{{ GetProfilePic(post.content._from) }}" 
                     alt="avatar"></a>
             </div>
             <div class="comment-content col-md-11 col-sm-10">
-                <h6 class="small comment-meta"><a href="/profile/{{ post.content._from }}">{{ getdetails(post.content._from).full_name }}</a> {{ parseTime(post.content.time) }}</h6>
+                <h6 class="small comment-meta"><a href="{{url_for('profile', zid=post.content._from)}}">{{ getdetails(post.content._from).full_name }}</a> {{ parseTime(post.content.time) }}</h6>
                 <div class="comment-body">
                     {% if post.content.message %}                        
                     <p>
                         {{ ParseMessage(post.content.message)|safe }}
-                        <br>
                         <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
                             <input type="hidden" name="callback" value="{{request.path}}"/>
                             <input type="hidden" name="addr" value="{{post.id}}"/>
@@ -66,11 +65,11 @@
                             {% if session['zid'] == post.content._from %}
                             <button style="margin-left:10px" class="btn btn-info small" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
                             {% endif %}
-                        </form>
+                        </form>            
                     </p>
                     <!-- Comment Box -->
                     <div class="comment-box" id="{{CleanID(post.id)}}">
-                        <form action="/post/comment" method="post">
+                        <form action="{{url_for('new_comment')}}" method="post">
                             <div class="row">
                                 <input type="hidden" name="parent" value="{{post.id}}">
                                 <input type="hidden" name="callback" value="{{request.path}}">
@@ -85,11 +84,11 @@
                                     </div>
                                 </div>
                                 <div class="col-1">
-                                    <button class="btn btn-primary" type="submit">Post Reply</button>                            
+                                    <button class="btn btn-primary" type="submit">Post Reply</button>
                                 </div>
                             </div>
                         </form>
-                    </div>                
+                    </div>
                     <!-- /Comment Box -->
                     {% endif %}
                 </div>
@@ -100,12 +99,12 @@
             <div class="comment-reply col-md-11 offset-md-1 col-sm-10 offset-sm-2">
                 <div class="row">
                     <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
-                        <a href=""><img class="mx-auto rounded-circle img-fluid" 
+                        <a href="{{url_for('profile', zid=comment.content._from)}}"><img class="mx-auto rounded-circle img-fluid" 
                             src="{{ GetProfilePic(comment.content._from) }}" 
                             alt="avatar"></a>
                     </div>
                     <div class="comment-content col-md-11 col-sm-10 col-12">
-                        <h6 class="small comment-meta"><a href="/profile/{{ comment.content._from }}">{{ getdetails(comment.content._from).full_name }}</a> {{ parseTime(comment.content.time) }}</h6>
+                        <h6 class="small comment-meta"><a href="{{url_for('profile', zid=comment.content._from)}}">{{ getdetails(comment.content._from).full_name }}</a> {{ parseTime(comment.content.time) }}</h6>
                         <div class="comment-body">
                             {% if comment.content.message %}
                             <p>{{ ParseMessage(comment.content.message)|safe  }}
@@ -119,10 +118,11 @@
                                     <button style="margin-left:10px" class="btn btn-info small" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
                                     {% endif %}
                                 </form>
+    
                             </p>
                             <!-- Comment Box -->
                             <div class="comment-box" id="{{CleanID(comment.id)}}">
-                                <form action="/post/comment" method="post">
+                                <form action="{{url_for('new_comment')}}" method="post">
                                     <div class="row">
                                         <input type="hidden" name="parent" value="{{comment.id}}">
                                         <input type="hidden" name="callback" value="{{request.path}}">
@@ -153,15 +153,14 @@
                 <div class="comment-reply col-md-11 offset-md-1 col-sm-10 offset-sm-2">
                     <div class="row">
                         <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
-                            <a href=""><img class="mx-auto rounded-circle img-fluid"
+                            <a href="{{url_for('profile', zid=reply.content._from)}}"><img class="mx-auto rounded-circle img-fluid"
                                 src="{{ GetProfilePic(reply.content._from) }}" 
-                                alt="avatar">
-                            </a>
+                                alt="avatar"></a>
                         </div>
                         <div class="comment-content col-md-11 col-sm-10 col-12">
-                            <h6 class="small comment-meta"><a href="/profile/{{ reply.content._from }}">{{ getdetails(reply.content._from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
+                            <h6 class="small comment-meta"><a href="{{url_for('profile', zid=reply.content._from)}}">{{ getdetails(reply.content._from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
                             <div class="comment-body">
-                                {% if post.content.message %}
+                                {% if post.content.message %}                    
                                 <p>{{ ParseMessage(reply.content.message)|safe }}
                                     <br>
                                     <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
@@ -170,18 +169,15 @@
                                         {% if session['zid'] == reply.content._from %}
                                         <button style="margin-left:10px" class="btn btn-info small" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
                                         {% endif %}
-                                    </form>            
+                                    </form> 
                                 </p>
-                                {% endif %}
+                                {% endif %}                                
                             </div>
                         </div>
                     </div>
                 </div>                                
                 {% endfor %}                            
                 <!-- /reply is indented -->
-
-
-
             </div>
             {% endfor %}                            
             <!-- /comment is indented -->
