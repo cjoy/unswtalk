@@ -28,6 +28,7 @@
 .comment-box {
     display: none;
 }
+
 </style>
 <script>
     function openComment(id) {
@@ -57,7 +58,15 @@
                     <p>
                         {{ ParseMessage(post.content.message)|safe }}
                         <br>
-                        <input type="button" class="btn btn-secondary small" onclick="openComment('{{CleanID(post.id)}}');" value="Reply">
+                        <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
+                            <input type="hidden" name="callback" value="{{request.path}}"/>
+                            <input type="hidden" name="addr" value="{{post.id}}"/>
+                            <input type="button" class="input-group btn btn-secondary small" style="width:55px"
+                                onclick="openComment('{{CleanID(post.id)}}');" value="Reply"/>
+                            {% if session['zid'] == post.content._from %}
+                            <button style="margin-left:10px" class="btn btn-info small" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                            {% endif %}
+                        </form>
                     </p>
                     <!-- Comment Box -->
                     <div class="comment-box" id="{{CleanID(post.id)}}">
@@ -101,7 +110,15 @@
                             {% if comment.content.message %}
                             <p>{{ ParseMessage(comment.content.message)|safe  }}
                                 <br>
-                                <input type="button" class="btn btn-secondary small" onclick="openComment('{{CleanID(comment.id)}}');" value="Reply">
+                                <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
+                                    <input type="hidden" name="callback" value="{{request.path}}"/>
+                                    <input type="hidden" name="addr" value="{{comment.id}}"/>
+                                    <input type="button" class="input-group btn btn-secondary small" style="width:55px"
+                                        onclick="openComment('{{CleanID(comment.id)}}');" value="Reply"/>
+                                    {% if session['zid'] == comment.content._from %}
+                                    <button style="margin-left:10px" class="btn btn-info small" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                                    {% endif %}
+                                </form>
                             </p>
                             <!-- Comment Box -->
                             <div class="comment-box" id="{{CleanID(comment.id)}}">
@@ -126,8 +143,6 @@
                                 </form>
                             </div>                
                             <!-- /Comment Box -->
-
-
                             {% endif %}
                         </div>
                     </div>
@@ -140,14 +155,21 @@
                         <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
                             <a href=""><img class="mx-auto rounded-circle img-fluid"
                                 src="{{ GetProfilePic(reply.content._from) }}" 
-                                alt="avatar"></a>
+                                alt="avatar">
+                            </a>
                         </div>
                         <div class="comment-content col-md-11 col-sm-10 col-12">
                             <h6 class="small comment-meta"><a href="/profile/{{ reply.content._from }}">{{ getdetails(reply.content._from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
                             <div class="comment-body">
                                 {% if post.content.message %}
                                 <p>{{ ParseMessage(reply.content.message)|safe }}
-                                    <br>
+                                    <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
+                                        <input type="hidden" name="callback" value="{{request.path}}"/>
+                                        <input type="hidden" name="addr" value="{{reply.id}}"/>
+                                        {% if session['zid'] == reply.content._from %}
+                                        <button style="margin-left:10px" class="btn btn-info small" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                                        {% endif %}
+                                    </form>            
                                 </p>
                                 {% endif %}
                             </div>

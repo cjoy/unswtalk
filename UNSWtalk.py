@@ -15,7 +15,7 @@ app = Flask(__name__)
 def start():
     # protected route - check if user logged in
     if 'logged_in' not in session:
-        return redirect('/login')
+        return redirect(url_for('login'))
 
     return redirect('/feeds')
 
@@ -26,7 +26,7 @@ def start():
 def delete_friend():
     # # protected route - check if user logged in
     if 'logged_in' not in session:
-        return redirect('/login')
+        return redirect(url_for('login'))
     # post error handlr
     post = True
     try:
@@ -34,7 +34,7 @@ def delete_friend():
          friend = request.form.get('friend')
          zid = session['zid']
     except:
-        callback = '/feeds'
+        callback = url_for('feeds')
         post = False
 
     if post == True:
@@ -47,7 +47,7 @@ def delete_friend():
 def add_friend():
     # # protected route - check if user logged in
     if 'logged_in' not in session:
-        return redirect('/login')
+        return redirect(url_for('login'))
     # post error handlr
     post = True
     try:
@@ -55,7 +55,7 @@ def add_friend():
          friend = request.form.get('friend')
          zid = session['zid']
     except:
-        callback = '/feeds'
+        callback = url_for('feeds')
         post = False
 
     if post == True:
@@ -64,12 +64,32 @@ def add_friend():
     return redirect(callback)
 
 # POST COMMENT ROUTE
+@app.route('/post/delete', methods=['POST', 'GET'])
+def delete_comment():
+    # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    # post error handlr bool
+    post = True
+    try:
+        callback = request.form.get('callback')
+        addr = request.form.get('addr')
+    except:
+        post = False
+        callback = url_for('feeds')
+    if post == True:
+        ctrl.DeletePost(addr)
+
+    return redirect(callback)
+
+
+
+# POST COMMENT ROUTE
 @app.route('/post/comment', methods=['POST', 'GET'])
 def new_comment():
     # protected route - check if user logged in
     if 'logged_in' not in session:
-        return redirect('/login')
-
+        return redirect(url_for('login'))
     # post error handlr bool
     post = True
     try:
@@ -79,11 +99,9 @@ def new_comment():
         zid = session['zid']
     except:
         post = False
-        callback = '/feeds'
-
+        callback = url_for('feeds')
     if post == True:
         ctrl.MakeCommentPost(parent, content, zid)
-
     return redirect(callback)
 
 # POST ROUTE
@@ -91,7 +109,7 @@ def new_comment():
 def new_post():
     # protected route - check if user logged in
     if 'logged_in' not in session:
-        return redirect('/login')
+        return redirect(url_for('login'))
 
     ctrl.MakePost(request.form.get('post_content'), session['zid'])
     return redirect(request.form.get('callback'))
@@ -101,7 +119,7 @@ def new_post():
 def feeds():
     # protected route - check if user logged in
     if 'logged_in' not in session:
-        return redirect('/login')
+        return redirect(url_for('login'))
 
     feeds = ctrl.GetUserFeeds(session['zid'])
     return render_template('feeds.html', title="My Feeds", feeds=feeds,
@@ -114,7 +132,7 @@ def feeds():
 def search_people():
     # protected route - check if user logged in
     if 'logged_in' not in session:
-        return redirect('/login')
+        return redirect(url_for('login'))
 
     # get search query
     query = request.args.get('q')
@@ -134,7 +152,7 @@ def search_people():
 def search_posts():
     # protected route - check if user logged in
     if 'logged_in' not in session:
-        return redirect('/login')
+        return redirect(url_for('login'))
 
     # get search query
     query = request.args.get('q')
@@ -150,12 +168,13 @@ def search_posts():
         parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage,
         results=results, query=query)
 
+
 # PROFILE ROUTE
 @app.route('/profile/<zid>', methods=['GET','POST'])
 def profile(zid):
     # protected route - check if user logged in
     if 'logged_in' not in session:
-        return redirect('/login')
+        return redirect(url_for('login'))
         
     student_to_show = zid
     details = ctrl.GetUserDetails(student_to_show)
@@ -169,6 +188,7 @@ def profile(zid):
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
         parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage, CleanID=ctrl.CleanID,
         courses=courses, friends=friends, isFriend=ctrl.CheckFriend(session['zid'],zid))
+
 
 # LOGIN ROUTE
 @app.route('/login', methods=['GET','POST'])
@@ -201,7 +221,7 @@ def logout():
     session.pop('logged_in', None)
     session.pop('zid', None)
     session.pop('user_details', None)
-    return redirect('/login')
+    return redirect(url_for('login'))
 
 
 if __name__ == '__main__':

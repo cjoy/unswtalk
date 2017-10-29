@@ -51,7 +51,7 @@ def parseTime(tstamp):
 
 # get user image
 def GetProfilePic(zid):
-    profile_pic = 'http://www.freeiconspng.com/uploads/profile-icon-9.png'
+    profile_pic = 'https://www.freeiconspng.com/uploads/profile-icon-9.png'
     file_path = os.path.join(students_dir, zid, "img.jpg")
     if os.path.exists(file_path):
         profile_pic = '/' + file_path
@@ -264,6 +264,11 @@ def MakeCommentPost(parent, message, zid):
     # write post
     with open(new_file, 'w') as outfile:
         yaml.dump(new_post, outfile, default_flow_style=False)
+    return
+
+
+def DeletePost(post):
+    print(post)
     return
 
 # check if user and friend are "friends"
