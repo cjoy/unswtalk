@@ -17,7 +17,7 @@ def start():
     if 'logged_in' not in session:
         return redirect(url_for('login'))
 
-    return redirect('/feeds')
+    return redirect(url_for('feeds'))
 
 
 
@@ -204,7 +204,7 @@ def login():
             session['logged_in'] = True
             session['zid'] = zid
             session['user_details'] = ctrl.GetUserDetails(zid)
-            return redirect('/')
+            return redirect(url_for('start'))
         else:
             status = False
 
