@@ -2,13 +2,16 @@ import os
 import glob
 import yaml, json, sys
 import re
-from datetime import datetime
+from time import gmtime, strftime
 import operator
 import random
 
 students_dir = "static/dataset-large";
 
-# Post Object
+# posts look-table up for faster searches
+posts_store = {}
+
+# Post Object (applies to posts, comments and replies)
 class Post:
     def __init__(self, fname):
         with open(fname) as f:
@@ -24,14 +27,19 @@ class Post:
                 if field.startswith('latitude:'):
                     self.latitude = field[len('latitude: '):].rstrip()
 
+# clean post and comment-ids
+# used for steralising jquery tags 
+def CleanID (_id):
+    _id = _id.replace('/', '-')
+    _id = _id.replace('.', '-')
+    return _id
+
 
 # allow quotes in yaml files
 def literalFile(content):
     content = re.sub('"','\\"',content)
     content = re.sub(':','',content)
     return content
-
-
 
 # TODO: parse datatime (for posts etc)
 def parseTime(tstamp):
@@ -45,8 +53,6 @@ def GetProfilePic(zid):
         profile_pic = '/' + file_path
     return profile_pic
 
-
-
 # Get user details, given zid
 def GetUserDetails(zid):
     details_filename = os.path.join(students_dir, zid, "student.txt")
@@ -55,7 +61,6 @@ def GetUserDetails(zid):
         with open(details_filename) as f:
             details = yaml.load(f.read())
     return details
-
 
 # Parse message helper - Replace ZID with Full Name
 def helper_name_replace(match):
@@ -71,6 +76,8 @@ def ParseMessage(message):
     try:
         message = re.sub(r'(z[0-9]+)', helper_name_replace, message)
         message = message.replace('\\n', '<br>')
+        message = message.replace('\\r', '')
+        message = message.replace('"', '')
     except:
         message = message
     return message
@@ -91,6 +98,53 @@ def SearchPeople(query):
             results.append(user)
     
     return results
+
+# Search for posts 
+def SearchPosts(query):
+    results = []
+
+    threads = []
+    # loop through all users dir
+    all_users_dir = os.path.join(students_dir)
+    for user in os.listdir(all_users_dir):
+        user_dir = os.path.join(students_dir, user)
+        # list all higher level posts
+        res = [f for f in os.listdir(user_dir) if re.search(r'\d{1,2}.txt', f)]
+        for post in res:
+            post_file = os.path.join(user_dir, post)
+
+            # cache look up in hash for better run time
+            if post_file in posts_store:
+                message = posts_store[post_file]
+            else:
+                try:
+                    message = Post(post_file).message # get post message
+                except:
+                    message = ""
+
+                posts_store[post_file] = message
+
+            if (query.lower() in message):
+                # get whole thread (for comments and replies)
+                super_file = post_file.split('/')
+                super_file_name = super_file[3]
+                super_file_name = super_file_name.split('-')
+                if '.txt' in super_file_name[0]:
+                    super_file_name = super_file_name[0]
+                else:
+                    super_file_name = super_file_name[0] + '.txt'                    
+                whole_thread = os.path.join(super_file[0],
+                    super_file[1],super_file[2],super_file_name)
+                if whole_thread not in threads:
+                    threads.append(whole_thread)
+
+    # after compiling post threads, fetch posts and compile
+    for thread in threads:
+        results.append(GetPostThread(thread))
+
+
+    return results
+
 
 # get post thread, given post id (eg. postid: dataset-medium/z5191841/12.txt)
 def GetPostThread(postid):
@@ -127,24 +181,33 @@ def GetPostThread(postid):
 
 # Get user posts, comments to those posts and replies to those posts
 def GetUserPosts(zid):
+    posts = []
+
+    # get user recent posts
     print("Getting posts for", zid)
     user_dir = os.path.join(students_dir, zid)
 
-    posts = []
-    for post in glob.glob(user_dir+'/[0-99].txt'):
-        posts.append(GetPostThread(post))
+    # create user feed
+    res = [f for f in os.listdir(user_dir) if re.search(r'^\d{1,2}.txt', f)]
+    for post in res:
+        post_file = os.path.join(user_dir, post)
+        posts.append(GetPostThread(post_file))
 
     return posts
 
 
 # Get user feeds
 def GetUserFeeds(zid):
+    # create user feed
     posts = []
 
     # get user recent posts
     user_dir = os.path.join(students_dir, zid)
-    for user_post in reversed(glob.glob(user_dir+'/[0-99].txt')):
-        posts.append(GetPostThread(user_post))
+    # list all higher level posts
+    res = [f for f in os.listdir(user_dir) if re.search(r'^\d{1,2}.txt', f)]
+    for post in res:
+        post_file = os.path.join(user_dir, post)
+        posts.append(GetPostThread(post_file))
 
     # loop though friends
     user_details = GetUserDetails(zid)
@@ -152,7 +215,7 @@ def GetUserFeeds(zid):
     for friend in friends:
         # get friend's recent posts
         friend_dir = os.path.join(students_dir, friend)
-        for friend_post in reversed(glob.glob(friend_dir+'/[0-99].txt')):
+        for friend_post in reversed(glob.glob(friend_dir+'/[0-9].txt')):
             posts.append(GetPostThread(friend_post))
 
     # MENTIONS DISABLED - WAY TOO SLOW
@@ -168,3 +231,62 @@ def GetUserFeeds(zid):
     #             posts.append(posts_content)
     
     return reversed(posts)
+
+def MakeCommentPost(parent, message, zid):
+    # init sub directories
+    sub_file = parent.split('.txt')[0]
+    sub_dirs = sub_file.split('/')
+    sub_root = os.path.join(sub_dirs[0],sub_dirs[1],sub_dirs[2])
+
+    # find last post & create new file path
+    res = [f for f in os.listdir(sub_root) if re.search(r'^'+sub_dirs[3]+'-\d+.txt$', f)]
+    last_suffix = 0
+    for r in res:
+        fn = r.split('.txt')[0]
+        ln = fn.rsplit('-')
+        if last_suffix < int(ln[len(ln)-1]):
+            last_suffix = int(ln[len(ln)-1])
+
+    # new file to write comment onto
+    new_file = sub_file+"-"+str(last_suffix+1)+'.txt'
+
+    # get time
+    time_now = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+
+    # save comment
+    # write post to file
+    new_post = {
+        'message': message,
+        'time': time_now,
+        'from': zid
+    }
+    # write post
+    with open(new_file, 'w') as outfile:
+        yaml.dump(new_post, outfile, default_flow_style=False)
+
+    return
+
+
+def MakePost(message, zid):
+    post_dir = os.path.join(students_dir, zid)
+    # list posts in user dir
+    res = [f for f in os.listdir(post_dir) if re.search(r'^\d+.txt$', f)]
+    # get filename for latest post
+    prefix = []
+    for f in res: prefix.append(int(f.split('.')[0]))
+    new_file_name = str(max(prefix)+1) + '.txt'
+    # get time
+    time_now = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
+    # write post to file
+    new_post = {
+        'message': message,
+        'time': time_now,
+        'from': zid
+    }
+    # write post
+    with open(os.path.join(post_dir, new_file_name), 'w') as outfile:
+        yaml.dump(new_post, outfile, default_flow_style=False)
+
+    print(yaml.safe_dump(new_post))
+
+    return

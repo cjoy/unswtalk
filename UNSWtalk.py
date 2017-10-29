@@ -10,7 +10,7 @@ import controller as ctrl
 
 app = Flask(__name__)
 
-
+# START ROUTE
 @app.route('/', methods=['GET','POST'])
 def start():
     # protected route - check if user logged in
@@ -19,7 +19,40 @@ def start():
 
     return redirect('/feeds')
 
+# POST COMMENT ROUTE
+@app.route('/post/comment', methods=['POST', 'GET'])
+def new_comment():
+    # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect('/login')
 
+    # post error handlr bool
+    post = True
+    try:
+        parent = request.form.get('parent')
+        callback = request.form.get('callback')
+        content = request.form.get('content')
+        zid = session['zid']
+    except:
+        post = False
+        callback = '/feeds'
+
+    if post == True:
+        ctrl.MakeCommentPost(parent, content, zid)
+
+    return redirect(callback)
+
+# POST ROUTE
+@app.route('/post', methods=['POST', 'GET'])
+def new_post():
+    # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect('/login')
+
+    ctrl.MakePost(request.form.get('post_content'), session['zid'])
+    return redirect(request.form.get('callback'))
+
+# FEEDS ROUTE
 @app.route('/feeds', methods=['GET','POST'])
 def feeds():
     # protected route - check if user logged in
@@ -29,9 +62,10 @@ def feeds():
     feeds = ctrl.GetUserFeeds(session['zid'])
     return render_template('feeds.html', title="My Feeds", feeds=feeds,
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
-        parseTime=ctrl.parseTime, ParseMessage=ctrl.ParseMessage)
+        parseTime=ctrl.parseTime, ParseMessage=ctrl.ParseMessage,
+        CleanID=ctrl.CleanID)
 
-
+# SEARCH PEOPLE ROUTE
 @app.route('/search/people', methods=['GET','POST'])
 def search_people():
     # protected route - check if user logged in
@@ -40,17 +74,39 @@ def search_people():
 
     # get search query
     query = request.args.get('q')
+    results = []
     if query == None:
         query = ''
-
-    # compute search results
-    results = ctrl.SearchPeople(query)
+    else:
+        # compute search results
+        results = ctrl.SearchPeople(query)
 
     return render_template('search_people.html', title='Search People - "' + query + '"', 
         GetProfilePic=ctrl.GetProfilePic,
         results=results, query=query)
-    
 
+# SEARCH POSTS ROUTE   
+@app.route('/search/posts', methods=['GET','POST'])
+def search_posts():
+    # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect('/login')
+
+    # get search query
+    query = request.args.get('q')
+    results = []
+    if query == None:
+        query = ''
+    else:
+        # compute search results
+        results = ctrl.SearchPosts(query)
+
+    return render_template('search_posts.html', title='Search Posts - "' + query + '"', 
+        getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
+        parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage,
+        results=results, query=query)
+
+# PROFILE ROUTE
 @app.route('/profile/<zid>', methods=['GET','POST'])
 def profile(zid):
     # protected route - check if user logged in
@@ -65,23 +121,19 @@ def profile(zid):
     friends = list(re.sub(r'(\(|\)|\s)', '', details['friends']).split(','))
 
     return render_template('profile.html', title=details['full_name'],
-        student_details=details, posts=reversed(posts),
+        student_details=details, posts=reversed(posts), zid=zid,
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
-        parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage,
+        parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage, CleanID=ctrl.CleanID,
         courses=courses, friends=friends)
 
-
+# LOGIN ROUTE
 @app.route('/login', methods=['GET','POST'])
 def login():
-    # test function
-    # feeds = ctrl.GetUserFeeds('z5195935')
-
     # error status is set to true
     status = True
-
+    # get credentials
     zid = request.form.get('zid')
     password = request.form.get('password')
-
     # check zid and password and set session
     if zid != None and password != None:
         if ctrl.GetUserDetails(zid)['password'] == password:
@@ -94,12 +146,12 @@ def login():
 
     return render_template('login.html', title="Login", status=status)
 
-
+# REGISTER ROUTE
 @app.route('/register', methods=['GET','POST'])
 def register():
     return render_template('register.html', title="Register")
 
-
+# LOGOUT ROUTE
 @app.route('/logout', methods=['GET','POST'])
 def logout():
     session.pop('logged_in', None)

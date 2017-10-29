@@ -1,6 +1,40 @@
 {% extends "base.html" %}
 
 {% block body_contents %}
+<div class="container">
+
+<div class="mdl-card mdl-shadow--2dp" style="width:100%; padding: 40px; margin-bottom:40px">
+    <form action="/post" method="post">
+        <input type="hidden" name="callback" value="{{request.path}}">
+        <div class="row">
+            <div class="col-2">
+                <img class="mx-auto rounded-circle img-fluid" 
+                src="{{ GetProfilePic(session['zid']) }}" 
+                alt="avatar">                
+            </div>
+            <div class="col-10">
+                <div class="form-group">
+                    <textarea class="form-control" id="post-box" name="post_content" rows="3" placeholder="What's on your mind?" required></textarea>
+                </div>
+              <button class="btn btn-primary" type="submit">Publish Post</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!--- Comment Box Utils -->
+<style>
+.comment-box {
+    display: none;
+}
+</style>
+<script>
+    function openComment(id) {
+        $("#"+id).slideToggle('fast')
+    }
+</script>
+<!--- /Comment Box Utils -->
 
 
 {% for post in feeds %}
@@ -23,10 +57,32 @@
                     <p>
                         {{ ParseMessage(post.content.message)|safe }}
                         <br>
-                        <a href="" class="text-right small"><i class="ion-reply"></i> Reply</a>
+                        <input type="button" class="btn btn-secondary small" onclick="openComment('{{CleanID(post.id)}}');" value="Reply">
                     </p>
+                    <!-- Comment Box -->
+                    <div class="comment-box" id="{{CleanID(post.id)}}">
+                        <form action="/post/comment" method="post">
+                            <div class="row">
+                                <input type="hidden" name="parent" value="{{post.id}}">
+                                <input type="hidden" name="callback" value="{{request.path}}">
+                                <div class="col-2">
+                                    <img class="mx-auto rounded-circle img-fluid" 
+                                    src="{{ GetProfilePic(session['zid']) }}" 
+                                    alt="avatar">                
+                                </div>
+                                <div class="col-9">
+                                    <div class="form-group">
+                                        <textarea class="form-control" id="post-box" name="content" rows="3" placeholder="Reply to comment" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-1">
+                                    <button class="btn btn-primary" type="submit">Post Reply</button>                            
+                                </div>
+                            </div>
+                        </form>
+                    </div>                
+                    <!-- /Comment Box -->
                     {% endif %}
-                    
                 </div>
             </div>
                 
@@ -45,8 +101,33 @@
                             {% if comment.content.message %}
                             <p>{{ ParseMessage(comment.content.message)|safe  }}
                                 <br>
-                                <a href="" class="text-right small"><i class="ion-reply"></i> Reply</a>
+                                <input type="button" class="btn btn-secondary small" onclick="openComment('{{CleanID(comment.id)}}');" value="Reply">
                             </p>
+                            <!-- Comment Box -->
+                            <div class="comment-box" id="{{CleanID(comment.id)}}">
+                                <form action="/post/comment" method="post">
+                                    <div class="row">
+                                        <input type="hidden" name="parent" value="{{comment.id}}">
+                                        <input type="hidden" name="callback" value="{{request.path}}">
+                                        <div class="col-2">
+                                            <img class="mx-auto rounded-circle img-fluid" 
+                                            src="{{ GetProfilePic(session['zid']) }}" 
+                                            alt="avatar">                
+                                        </div>
+                                        <div class="col-9">
+                                            <div class="form-group">
+                                                <textarea class="form-control" id="post-box" name="content" rows="3" placeholder="Reply to comment" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-1">
+                                            <button class="btn btn-primary" type="submit">Post Reply</button>                            
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>                
+                            <!-- /Comment Box -->
+
+
                             {% endif %}
                         </div>
                     </div>
@@ -64,12 +145,11 @@
                         <div class="comment-content col-md-11 col-sm-10 col-12">
                             <h6 class="small comment-meta"><a href="/profile/{{ reply.content._from }}">{{ getdetails(reply.content._from).full_name }}</a> {{ parseTime(reply.content.time) }}</h6>
                             <div class="comment-body">
-                                {% if post.content.message %}                    
+                                {% if post.content.message %}
                                 <p>{{ ParseMessage(reply.content.message)|safe }}
                                     <br>
-                                    <a href="" class="text-right small"><i class="ion-reply"></i> Reply</a>
                                 </p>
-                                {% endif %}                                
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -90,6 +170,6 @@
 </div>
 {% endfor %}
 
-
+</div>
 {% endblock %}
 
