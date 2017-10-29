@@ -163,6 +163,7 @@
                             <div class="comment-body">
                                 {% if post.content.message %}
                                 <p>{{ ParseMessage(reply.content.message)|safe }}
+                                    <br>
                                     <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
                                         <input type="hidden" name="callback" value="{{request.path}}"/>
                                         <input type="hidden" name="addr" value="{{reply.id}}"/>

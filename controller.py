@@ -7,7 +7,7 @@ import time
 import operator
 import random
 
-students_dir = "static/dataset-large";
+students_dir = "static/dataset-small";
 
 # posts look-table up for faster searches
 posts_store = {}
@@ -35,7 +35,6 @@ def CleanID (_id):
     _id = _id.replace('/', '-')
     _id = _id.replace('.', '-')
     return _id
-
 
 # allow quotes in yaml files
 def literalFile(content):
@@ -268,7 +267,14 @@ def MakeCommentPost(parent, message, zid):
 
 
 def DeletePost(post):
-    print(post)
+    dir_sub = post.split('/')
+    delfile = post.split('.txt')[0]
+    delname = delfile.split('/')[3]
+    for f in os.listdir(os.path.join(dir_sub[0], dir_sub[1], dir_sub[2])):
+        if re.search('^'+delname, f):
+            os.remove(os.path.join(dir_sub[0], dir_sub[1], dir_sub[2],f))
+
+    print(delfile)
     return
 
 # check if user and friend are "friends"
