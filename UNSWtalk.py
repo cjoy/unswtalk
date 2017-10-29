@@ -117,7 +117,39 @@ def login():
 # REGISTER ROUTE
 @app.route('/register', methods=['GET','POST'])
 def register():
-    return render_template('register.html', title="Register")
+    # error status is set to true
+    status = True
+    # get credentials
+    post = True
+    try:
+        zid = request.form.get('zid')
+        email = request.form.get('email')
+        full_name = request.form.get('full_name')
+        password = request.form.get('password')
+        confirmPassword = request.form.get('confirmPassword')
+    except:
+        post = False
+        
+    # error handling
+    if post == False:
+        status = False
+    else:
+        try:
+            if password != confirmPassword:
+                status = False            
+            elif 'zid' in ctrl.GetUserDetails(zid):
+                status = False
+            elif not re.match(r'(\bz[0-9]{7}\b)', zid):
+                status = False
+        except:
+            status = False
+
+    # create account
+    if status == True:
+        ctrl.RegisterAccount(zid, email, full_name, password)
+        return redirect(url_for('login'))
+
+    return render_template('register.html', title="Register", status=status)
 
 # LOGOUT ROUTE
 @app.route('/logout', methods=['GET','POST'])
@@ -155,7 +187,7 @@ def delete_friend():
 # ADD FRIEND
 @app.route('/friend/add', methods=['POST', 'GET'])
 def add_friend():
-    # # protected route - check if user logged in
+    # protected route - check if user logged in
     if 'logged_in' not in session:
         return redirect(url_for('login'))
     # post error handlr

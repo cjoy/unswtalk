@@ -172,7 +172,6 @@ def SearchPosts(query):
     for thread in threads:
         results.append(GetPostThread(thread))
 
-
     return results
 
 
@@ -372,7 +371,10 @@ def MakePost(message, zid):
     # get filename for latest post
     prefix = []
     for f in res: prefix.append(int(f.split('.')[0]))
-    new_file_name = str(max(prefix)+1) + '.txt'
+    try:
+        new_file_name = str(max(prefix)+1) + '.txt'
+    except:
+        new_file_name = '0.txt'
     # get time
     time_now = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
     # write post to file
@@ -385,6 +387,33 @@ def MakePost(message, zid):
     with open(os.path.join(post_dir, new_file_name), 'w') as outfile:
         yaml.dump(new_post, outfile, default_flow_style=False)
 
-    print(yaml.safe_dump(new_post))
+    return
+
+def RegisterAccount(zid, email, full_name, password):
+    userObj = {
+        'birthday': '1994-06-20',
+        'email': email,
+        'full_name': full_name,
+        'home_suburb': 'UNSW',
+        'password': password,
+        'program': 'Unspecified',
+        'friends': '(z5195935)',
+        'courses': '(2017 S2 COMP2041)',
+        'zid': zid
+    }
+
+    # create new folder for user
+    newpath = os.path.join(students_dir, zid)
+    if not os.path.exists(newpath):
+        os.makedirs(newpath)
+
+    # print(yaml.load(userObj))
+    with open(os.path.join(newpath, 'student.txt'), 'w') as outfile:
+        yaml.dump(userObj, outfile, default_flow_style=False)
+
+    # send email for student verification
+    subject = "Welcome to UNSWtalk"
+    message = 'Welcome to UNSWtalk - by Chris Joy <br><br> Please verify your account by clicking on <a href="http://localhost:5000/verify/'+zid+'">this link</a>.'
+    send_email(email, subject, message)
 
     return
