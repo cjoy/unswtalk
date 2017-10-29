@@ -221,14 +221,25 @@
 
             <div class="mdl-grid">                    
                 {% for friend in friends %}
-                <div class="mdl-cell mdl-cell--4-col  mdl-card mdl-shadow--2dp" style="width:200px">
+                <div class="mdl-cell mdl-cell--4-col  mdl-card mdl-shadow--2dp" style="width:200px; height:270px;">
+
+                    {% if zid == session['zid'] %}
+                    <div class="card-menu" style="margin-bottom:15px">
+                            <form style="width:20px; height:20px" type="submit" method="post" action="/friend/delete">
+                                <input type="hidden" name="friend" value="{{friend}}"/>
+                                <input type="hidden" name="callback" value="{{request.path}}#friends"/>
+                                <button type="submit" class="btn btn-info btn-sm"> Unfriend</button>
+                            </form>                                
+                    </div>
+                    {% endif %}
+
                     <a href="/profile/{{ friend }}">
                     <img class="card-img-top" style="width:100%" src="{{ GetProfilePic(friend) }}" alt="Card image cap">
                     <div class="card-block">
                         <h4 class="card-title">{{ getdetails(friend)['full_name'] }}</h4>
-                    </div>
+                    </div>                        
                     </a>
-                </div>   
+                </div>
                 {% endfor %}
             </div>
         

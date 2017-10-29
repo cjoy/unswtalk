@@ -3,6 +3,7 @@ import glob
 import yaml, json, sys
 import re
 from time import gmtime, strftime
+import time
 import operator
 import random
 
@@ -13,6 +14,7 @@ posts_store = {}
 
 # Post Object (applies to posts, comments and replies)
 class Post:
+    # posts constructor
     def __init__(self, fname):
         with open(fname) as f:
             for field in f:
@@ -41,9 +43,11 @@ def literalFile(content):
     content = re.sub(':','',content)
     return content
 
-# TODO: parse datatime (for posts etc)
+# CREDITS: 
+# https://stackoverflow.com/questions/214777/how-do-you-convert-yyyy-mm-ddthhmmss-000z-time-format-to-mm-dd-yyyy-time-forma
 def parseTime(tstamp):
-    return tstamp
+    ts = time.strptime(tstamp[:19], "%Y-%m-%dT%H:%M:%S")
+    return  time.strftime("Posted on %d/%m/%Y at %H:%M", ts)
 
 # get user image
 def GetProfilePic(zid):
@@ -264,6 +268,47 @@ def MakeCommentPost(parent, message, zid):
     with open(new_file, 'w') as outfile:
         yaml.dump(new_post, outfile, default_flow_style=False)
 
+    return
+
+
+def AddDeleteFriend(action, zid,friend):
+    user_dir = os.path.join(students_dir, zid, 'student.txt')
+    friend_dir = os.path.join(students_dir, friend, 'student.txt')
+    
+    # update target friends (bilaterial removal)
+    updated_target_friends = GetUserDetails(zid)['friends'].strip('(').strip(')').split(', ')
+    updated_target_friends_len = len(updated_target_friends)
+    if action == 'add':
+        updated_target_friends.append(friend)
+    elif action == 'delete':
+        updated_target_friends.remove(friend)        
+    updated_target_friends = str(tuple(updated_target_friends))
+    if updated_target_friends_len == 2: updated_target_friends = updated_target_friends.replace(',', '')
+    updated_target_friends = updated_target_friends.replace('\'', '')
+
+    # update destination friends (bilaterial removal)
+    updated_dest_friends = GetUserDetails(friend)['friends'].strip('(').strip(')').split(', ')
+    updated_dest_friends_len = len(updated_dest_friends)
+    if action == 'add':
+        updated_dest_friends.append(zid)
+    elif action == 'delete':
+        updated_dest_friends.remove(zid)
+    updated_dest_friends = str(tuple(updated_dest_friends))
+    if updated_dest_friends_len == 2: updated_dest_friends = updated_dest_friends.replace(',', '')
+    updated_dest_friends = updated_dest_friends.replace('\'', '')    
+
+    # create new student objects
+    target_obj = GetUserDetails(zid)
+    target_obj['friends'] = updated_target_friends
+    dest_obj = GetUserDetails(zid)
+    dest_obj['friends'] = updated_dest_friends
+
+    # write new user objects to disk
+    with open(user_dir, 'w') as outfile:
+        yaml.dump(target_obj, outfile, default_flow_style=False)
+    with open(friend_dir, 'w') as outfile:
+        yaml.dump(dest_obj, outfile, default_flow_style=False)
+        
     return
 
 

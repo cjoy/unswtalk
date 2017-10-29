@@ -19,6 +19,50 @@ def start():
 
     return redirect('/feeds')
 
+
+
+# DELETE FRIEND
+@app.route('/friend/delete', methods=['POST', 'GET'])
+def delete_friend():
+    # # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect('/login')
+    # post error handlr
+    post = True
+    try:
+         callback = request.form.get('callback')
+         friend = request.form.get('friend')
+         zid = session['zid']
+    except:
+        callback = '/feeds'
+        post = False
+
+    if post == True:
+        ctrl.AddDeleteFriend('delete', zid, friend)
+
+    return redirect(callback)
+
+# ADD FRIEND
+@app.route('/friend/add', methods=['POST', 'GET'])
+def add_friend():
+    # # protected route - check if user logged in
+    if 'logged_in' not in session:
+        return redirect('/login')
+    # post error handlr
+    post = True
+    try:
+         callback = request.form.get('callback')
+         friend = request.form.get('friend')
+         zid = session['zid']
+    except:
+        callback = '/feeds'
+        post = False
+
+    if post == True:
+        ctrl.AddDeleteFriend('add', zid, friend)
+
+    return redirect(callback)
+
 # POST COMMENT ROUTE
 @app.route('/post/comment', methods=['POST', 'GET'])
 def new_comment():
@@ -117,8 +161,8 @@ def profile(zid):
     details = ctrl.GetUserDetails(student_to_show)
     posts = ctrl.GetUserPosts(student_to_show)
 
-    courses = list(re.sub(r'(\(|\))', '', details['courses']).split(','))
-    friends = list(re.sub(r'(\(|\)|\s)', '', details['friends']).split(','))
+    courses = details['courses'].strip('(').strip(')').split(', ')
+    friends = details['friends'].strip('(').strip(')').split(', ')
 
     return render_template('profile.html', title=details['full_name'],
         student_details=details, posts=reversed(posts), zid=zid,
