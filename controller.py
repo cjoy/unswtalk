@@ -78,7 +78,7 @@ def helper_name_replace(match):
 # Parse messages (friends tagging and html in comments)
 def ParseMessage(message):
     try:
-        message = re.sub(r'(z[0-9]+)', helper_name_replace, message)
+        message = re.sub(r'(\bz[0-9]{7}\b)', helper_name_replace, message)
         message = message.replace('\\n', '<br>')
         message = message.replace('\\r', '')
         message = message.replace('"', '')
@@ -233,7 +233,8 @@ def GetUserFeeds(zid):
     #         # append if mentioned
     #         if zid in posts_content['content'].message:
     #             posts.append(posts_content)
-    
+    posts = sorted(posts, key=lambda x: str(x['content'].time))
+
     return reversed(posts)
 
 def MakeCommentPost(parent, message, zid):
@@ -241,7 +242,6 @@ def MakeCommentPost(parent, message, zid):
     sub_file = parent.split('.txt')[0]
     sub_dirs = sub_file.split('/')
     sub_root = os.path.join(sub_dirs[0],sub_dirs[1],sub_dirs[2])
-
     # find last post & create new file path
     res = [f for f in os.listdir(sub_root) if re.search(r'^'+sub_dirs[3]+'-\d+.txt$', f)]
     last_suffix = 0
@@ -250,13 +250,10 @@ def MakeCommentPost(parent, message, zid):
         ln = fn.rsplit('-')
         if last_suffix < int(ln[len(ln)-1]):
             last_suffix = int(ln[len(ln)-1])
-
     # new file to write comment onto
     new_file = sub_file+"-"+str(last_suffix+1)+'.txt'
-
     # get time
     time_now = strftime("%Y-%m-%dT%H:%M:%S+0000", gmtime())
-
     # save comment
     # write post to file
     new_post = {
@@ -267,9 +264,16 @@ def MakeCommentPost(parent, message, zid):
     # write post
     with open(new_file, 'w') as outfile:
         yaml.dump(new_post, outfile, default_flow_style=False)
-
     return
 
+# check if user and friend are "friends"
+def CheckFriend(user,friend):
+    user_dir = os.path.join(students_dir, user, 'student.txt')
+    user_friends = GetUserDetails(user)['friends'].strip('(').strip(')').split(', ')
+    isFriend = False
+    if friend in user_friends:
+        isFriend = True
+    return isFriend
 
 def AddDeleteFriend(action, zid,friend):
     user_dir = os.path.join(students_dir, zid, 'student.txt')
@@ -279,9 +283,11 @@ def AddDeleteFriend(action, zid,friend):
     updated_target_friends = GetUserDetails(zid)['friends'].strip('(').strip(')').split(', ')
     updated_target_friends_len = len(updated_target_friends)
     if action == 'add':
-        updated_target_friends.append(friend)
+        if friend not in updated_target_friends:
+            updated_target_friends.append(friend)
     elif action == 'delete':
-        updated_target_friends.remove(friend)        
+        if friend in updated_target_friends:
+            updated_target_friends.remove(friend)
     updated_target_friends = str(tuple(updated_target_friends))
     if updated_target_friends_len == 2: updated_target_friends = updated_target_friends.replace(',', '')
     updated_target_friends = updated_target_friends.replace('\'', '')
@@ -290,9 +296,11 @@ def AddDeleteFriend(action, zid,friend):
     updated_dest_friends = GetUserDetails(friend)['friends'].strip('(').strip(')').split(', ')
     updated_dest_friends_len = len(updated_dest_friends)
     if action == 'add':
-        updated_dest_friends.append(zid)
+        if zid not in updated_dest_friends:
+            updated_dest_friends.append(zid)
     elif action == 'delete':
-        updated_dest_friends.remove(zid)
+        if zid in updated_dest_friends:
+            updated_dest_friends.remove(zid)
     updated_dest_friends = str(tuple(updated_dest_friends))
     if updated_dest_friends_len == 2: updated_dest_friends = updated_dest_friends.replace(',', '')
     updated_dest_friends = updated_dest_friends.replace('\'', '')    
@@ -300,7 +308,7 @@ def AddDeleteFriend(action, zid,friend):
     # create new student objects
     target_obj = GetUserDetails(zid)
     target_obj['friends'] = updated_target_friends
-    dest_obj = GetUserDetails(zid)
+    dest_obj = GetUserDetails(friend)
     dest_obj['friends'] = updated_dest_friends
 
     # write new user objects to disk

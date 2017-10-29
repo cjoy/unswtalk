@@ -168,7 +168,7 @@ def profile(zid):
         student_details=details, posts=reversed(posts), zid=zid,
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
         parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage, CleanID=ctrl.CleanID,
-        courses=courses, friends=friends)
+        courses=courses, friends=friends, isFriend=ctrl.CheckFriend(session['zid'],zid))
 
 # LOGIN ROUTE
 @app.route('/login', methods=['GET','POST'])

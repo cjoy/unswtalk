@@ -29,6 +29,22 @@
                     <h2>{{student_details['full_name']}}</h2>
                     <small style="font-size:10"><i class="fa fa-book" aria-hidden="true"></i> {{student_details['program']}}</small>
                     <br><small style="font-size:10"><i class="fa fa-map-marker" aria-hidden="true"></i> {{student_details['home_suburb']}}</small>
+                    
+                    {% if zid != session['zid'] and isFriend == False %}
+                    <form style="width:20px; height:20px" type="submit" method="post" action="/friend/add">
+                        <input type="hidden" name="friend" value="{{zid}}"/>
+                        <input type="hidden" name="callback" value="{{request.path}}"/>
+                        <button type="submit" class="btn btn-success btn-lg"><i class="fa fa-plus" aria-hidden="true"></i> Add Friend </button>
+                    </form>
+                    {% endif %}
+                    {% if zid != session['zid'] and isFriend == True %}
+                    <form style="width:20px; height:20px" type="submit" method="post" action="/friend/delete">
+                        <input type="hidden" name="friend" value="{{zid}}"/>
+                        <input type="hidden" name="callback" value="{{request.path}}"/>
+                        <button type="submit" class="btn btn-danger btn-lg"><i class="fa fa-minus-circle" aria-hidden="true"></i> Pending</button>
+                    </form>
+                    {% endif %}
+                    
                 </div>
             </div>
         </div>
