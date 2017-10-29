@@ -15,7 +15,6 @@
         </div>
     </form>
 </div>
-
 {% if query %}
 <div class="mdl-card mdl-shadow--2dp" style="width:100%">
     <div style="padding: 40px">
@@ -23,8 +22,8 @@
         <div class="mdl-grid">
             {% for result in results %}
             <div class="mdl-cell mdl-cell--4-col  mdl-card mdl-shadow--2dp" style="width:200px">
-                <a href="{{url_for('profile',zid=result['zid'])}}">
-                <img class="card-img-top" style="width:100%" src="{{ GetProfilePic(result['zid']) }}" alt="Card image cap">
+                <a href="{{url_for('profile',zid=result['zid'])}}"> 
+                <img class="card-img-top" style="width:100%" src="{{ url_for('static', filename=RemoveStatic(GetProfilePic(result['zid']))) }}" alt="Card image cap">
                 <div class="card-block">
                     <h4 class="card-title">{{ result['full_name'] }}</h4>
                 </div>

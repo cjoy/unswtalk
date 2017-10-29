@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-2">
                 <img class="mx-auto rounded-circle img-fluid" 
-                src="{{ GetProfilePic(session['zid']) }}" 
+                src="{{url_for('static', filename=RemoveStatic( GetProfilePic(session['zid']) ))}}" 
                 alt="avatar">                
             </div>
             <div class="col-10">
@@ -37,7 +37,6 @@
 </script>
 <!--- /Comment Box Utils -->
 
-
 {% for post in feeds %}
 <div class="mdl-card mdl-shadow--2dp" style="width:100%; padding: 40px; margin-bottom:40px">
 
@@ -48,7 +47,8 @@
             <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
                 <a href="{{url_for('profile', zid=post.content._from)}}">
                     <img class="mx-auto rounded-circle img-fluid" 
-                    src="{{ GetProfilePic(post.content._from) }}" 
+                    src="{{url_for('static', filename=RemoveStatic( GetProfilePic(post.content._from) ))}}"
+                    
                     alt="avatar"></a>
             </div>
             <div class="comment-content col-md-11 col-sm-10">
@@ -75,8 +75,8 @@
                                 <input type="hidden" name="callback" value="{{request.path}}">
                                 <div class="col-2">
                                     <img class="mx-auto rounded-circle img-fluid" 
-                                    src="{{ GetProfilePic(session['zid']) }}" 
-                                    alt="avatar">                
+                                    src="{{url_for('static', filename=RemoveStatic( GetProfilePic(session['zid']) ))}}" 
+                                    alt="avatar">
                                 </div>
                                 <div class="col-9">
                                     <div class="form-group">
@@ -100,7 +100,7 @@
                 <div class="row">
                     <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
                         <a href="{{url_for('profile', zid=comment.content._from)}}"><img class="mx-auto rounded-circle img-fluid" 
-                            src="{{ GetProfilePic(comment.content._from) }}" 
+                            src="{{url_for('static', filename=RemoveStatic( GetProfilePic(comment.content._from) ))}}" 
                             alt="avatar"></a>
                     </div>
                     <div class="comment-content col-md-11 col-sm-10 col-12">
@@ -128,7 +128,7 @@
                                         <input type="hidden" name="callback" value="{{request.path}}">
                                         <div class="col-2">
                                             <img class="mx-auto rounded-circle img-fluid" 
-                                            src="{{ GetProfilePic(session['zid']) }}" 
+                                            src="{{url_for('static', filename=RemoveStatic( GetProfilePic(session['zid']) ))}}" 
                                             alt="avatar">                
                                         </div>
                                         <div class="col-9">
@@ -154,7 +154,7 @@
                     <div class="row">
                         <div class="comment-avatar col-md-1 col-sm-2 text-center pr-1">
                             <a href="{{url_for('profile', zid=reply.content._from)}}"><img class="mx-auto rounded-circle img-fluid"
-                                src="{{ GetProfilePic(reply.content._from) }}" 
+                                src="{{url_for('static', filename=RemoveStatic( GetProfilePic(reply.content._from) ))}}" 
                                 alt="avatar"></a>
                         </div>
                         <div class="comment-content col-md-11 col-sm-10 col-12">

@@ -124,8 +124,8 @@ def feeds():
     feeds = ctrl.GetUserFeeds(session['zid'])
     return render_template('feeds.html', title="My Feeds", feeds=feeds,
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
-        parseTime=ctrl.parseTime, ParseMessage=ctrl.ParseMessage,
-        CleanID=ctrl.CleanID)
+        parseTime=ctrl.parseTime, ParseMessage=ctrl.ParseMessage, 
+        RemoveStatic=ctrl.RemoveStatic, CleanID=ctrl.CleanID)
 
 # SEARCH PEOPLE ROUTE
 @app.route('/search/people', methods=['GET','POST'])
@@ -144,7 +144,7 @@ def search_people():
         results = ctrl.SearchPeople(query)
 
     return render_template('search_people.html', title='Search People - "' + query + '"', 
-        GetProfilePic=ctrl.GetProfilePic,
+        GetProfilePic=ctrl.GetProfilePic, RemoveStatic=ctrl.RemoveStatic,
         results=results, query=query)
 
 # SEARCH POSTS ROUTE   
@@ -166,7 +166,7 @@ def search_posts():
     return render_template('search_posts.html', title='Search Posts - "' + query + '"', 
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
         parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage, CleanID=ctrl.CleanID,
-        results=results, query=query)
+        results=results, query=query, RemoveStatic=ctrl.RemoveStatic)
 
 
 # PROFILE ROUTE
@@ -187,7 +187,8 @@ def profile(zid):
         student_details=details, posts=reversed(posts), zid=zid,
         getdetails=ctrl.GetUserDetails, GetProfilePic=ctrl.GetProfilePic,
         parseTime=ctrl.parseTime,  ParseMessage=ctrl.ParseMessage, CleanID=ctrl.CleanID,
-        courses=courses, friends=friends, isFriend=ctrl.CheckFriend(session['zid'],zid))
+        courses=courses, friends=friends, isFriend=ctrl.CheckFriend(session['zid'],zid),
+        RemoveStatic=ctrl.RemoveStatic)
 
 
 # LOGIN ROUTE

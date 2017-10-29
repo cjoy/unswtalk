@@ -36,6 +36,11 @@ def CleanID (_id):
     _id = _id.replace('.', '-')
     return _id
 
+
+# remove static infront of url
+def RemoveStatic(url):
+    return url.replace('/static/', '')
+
 # allow quotes in yaml files
 def literalFile(content):
     content = re.sub('"','\\"',content)
