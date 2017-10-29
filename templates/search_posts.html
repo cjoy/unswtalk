@@ -56,7 +56,6 @@
                             <p>
                                 {{ ParseMessage(post.content.message)|safe }}
                                 <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
-                                    <input type="hidden" name="callback" value="{{request.path}}"/>
                                     <input type="hidden" name="addr" value="{{post.id}}"/>
                                     <input type="button" class="input-group btn btn-secondary small" style="width:55px"
                                         onclick="openComment('{{CleanID(post.id)}}');" value="Reply"/>
@@ -70,7 +69,6 @@
                                 <form action="{{url_for('new_comment')}}" method="post">
                                     <div class="row">
                                         <input type="hidden" name="parent" value="{{post.id}}">
-                                        <input type="hidden" name="callback" value="{{request.path}}">
                                         <div class="col-2">
                                             <img class="mx-auto rounded-circle img-fluid" 
                                             src="{{url_for('static', filename=RemoveStatic( GetProfilePic(session['zid']) ))}}" 
@@ -108,7 +106,6 @@
                                     <p>{{ ParseMessage(comment.content.message)|safe  }}
                                         <br>
                                         <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
-                                            <input type="hidden" name="callback" value="{{request.path}}"/>
                                             <input type="hidden" name="addr" value="{{comment.id}}"/>
                                             <input type="button" class="input-group btn btn-secondary small" style="width:55px"
                                                 onclick="openComment('{{CleanID(comment.id)}}');" value="Reply"/>
@@ -123,7 +120,6 @@
                                         <form action="{{url_for('new_comment')}}" method="post">
                                             <div class="row">
                                                 <input type="hidden" name="parent" value="{{comment.id}}">
-                                                <input type="hidden" name="callback" value="{{request.path}}">
                                                 <div class="col-2">
                                                     <img class="mx-auto rounded-circle img-fluid" 
                                                     src="{{url_for('static', filename=RemoveStatic( GetProfilePic(session['zid']) ))}}" 
@@ -162,7 +158,6 @@
                                         <p>{{ ParseMessage(reply.content.message)|safe }}
                                             <br>
                                             <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
-                                                <input type="hidden" name="callback" value="{{request.path}}"/>
                                                 <input type="hidden" name="addr" value="{{reply.id}}"/>
                                                 {% if session['zid'] == reply.content._from %}
                                                 <button style="margin-left:10px" class="btn btn-info small" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i></button>

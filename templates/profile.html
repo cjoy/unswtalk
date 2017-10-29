@@ -32,14 +32,12 @@
                     {% if zid != session['zid'] and isFriend == False %}
                     <form style="width:20px; height:20px" type="submit" method="post" action="{{url_for('add_friend')}}">
                         <input type="hidden" name="friend" value="{{zid}}"/>
-                        <input type="hidden" name="callback" value="{{request.path}}"/>
                         <button type="submit" class="btn btn-success btn-lg"><i class="fa fa-plus" aria-hidden="true"></i> Add Friend </button>
                     </form>
                     {% endif %}
                     {% if zid != session['zid'] and isFriend == True %}
                     <form style="width:20px; height:20px" type="submit" method="post" action="{{url_for('delete_friend')}}">
                         <input type="hidden" name="friend" value="{{zid}}"/>
-                        <input type="hidden" name="callback" value="{{request.path}}"/>
                         <button type="submit" class="btn btn-danger btn-lg"><i class="fa fa-minus-circle" aria-hidden="true"></i> Pending - Unfriend</button>
                     </form>
                     {% endif %}
@@ -74,7 +72,6 @@
         {% if zid == session['zid'] %}
         <div class="mdl-card mdl-shadow--2dp" style="width:100%; padding: 40px; margin-bottom:40px">
             <form action="{{url_for('new_post')}}" method="post">
-                <input type="hidden" name="callback" value="{{request.path}}">                
                 <div class="row">
                     <div class="col-1">
                         <img class="mx-auto rounded-circle img-fluid" 
@@ -113,7 +110,6 @@
                             <p>
                                 {{ ParseMessage(post.content.message)|safe }}
                                 <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
-                                    <input type="hidden" name="callback" value="{{request.path}}"/>
                                     <input type="hidden" name="addr" value="{{post.id}}"/>
                                     <input type="button" class="input-group btn btn-secondary small" style="width:55px"
                                         onclick="openComment('{{CleanID(post.id)}}');" value="Reply"/>
@@ -127,7 +123,6 @@
                                 <form action="{{url_for('new_comment')}}" method="post">
                                     <div class="row">
                                         <input type="hidden" name="parent" value="{{post.id}}">
-                                        <input type="hidden" name="callback" value="{{request.path}}">
                                         <div class="col-2">
                                             <img class="mx-auto rounded-circle img-fluid" 
                                             src="{{url_for('static', filename=RemoveStatic( GetProfilePic(session['zid']) ))}}" 
@@ -165,7 +160,6 @@
                                     <p>{{ ParseMessage(comment.content.message)|safe  }}
                                         <br>
                                         <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
-                                            <input type="hidden" name="callback" value="{{request.path}}"/>
                                             <input type="hidden" name="addr" value="{{comment.id}}"/>
                                             <input type="button" class="input-group btn btn-secondary small" style="width:55px"
                                                 onclick="openComment('{{CleanID(comment.id)}}');" value="Reply"/>
@@ -180,7 +174,6 @@
                                         <form action="{{url_for('new_comment')}}" method="post">
                                             <div class="row">
                                                 <input type="hidden" name="parent" value="{{comment.id}}">
-                                                <input type="hidden" name="callback" value="{{request.path}}">
                                                 <div class="col-2">
                                                     <img class="mx-auto rounded-circle img-fluid" 
                                                     src="{{url_for('static', filename=RemoveStatic( GetProfilePic(session['zid']) ))}}" 
@@ -219,7 +212,6 @@
                                         <p>{{ ParseMessage(reply.content.message)|safe }}
                                             <br>
                                             <form class="form-inline" method="post" action="{{url_for('delete_comment')}}">
-                                                <input type="hidden" name="callback" value="{{request.path}}"/>
                                                 <input type="hidden" name="addr" value="{{reply.id}}"/>
                                                 {% if session['zid'] == reply.content._from %}
                                                 <button style="margin-left:10px" class="btn btn-info small" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
@@ -266,7 +258,6 @@
                     <div class="card-menu" style="margin-bottom:15px">
                             <form style="width:20px; height:20px" type="submit" method="post" action="{{url_for('delete_friend')}}">
                                 <input type="hidden" name="friend" value="{{friend}}"/>
-                                <input type="hidden" name="callback" value="{{request.path}}#friends"/>
                                 <button type="submit" class="btn btn-info btn-sm"> Unfriend</button>
                             </form>
                     </div>

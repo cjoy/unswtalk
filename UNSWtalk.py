@@ -30,17 +30,15 @@ def delete_friend():
     # post error handlr
     post = True
     try:
-         callback = request.form.get('callback')
          friend = request.form.get('friend')
          zid = session['zid']
     except:
-        callback = url_for('feeds')
         post = False
 
     if post == True:
         ctrl.AddDeleteFriend('delete', zid, friend)
 
-    return redirect(callback)
+    return redirect(url_for('profile',zid=session['zid']))
 
 # ADD FRIEND
 @app.route('/friend/add', methods=['POST', 'GET'])
@@ -51,17 +49,15 @@ def add_friend():
     # post error handlr
     post = True
     try:
-         callback = request.form.get('callback')
          friend = request.form.get('friend')
          zid = session['zid']
     except:
-        callback = url_for('feeds')
         post = False
 
     if post == True:
         ctrl.AddDeleteFriend('add', zid, friend)
 
-    return redirect(callback)
+    return redirect(url_for('profile',zid=session['zid']))
 
 # POST COMMENT ROUTE
 @app.route('/post/delete', methods=['POST', 'GET'])
@@ -72,15 +68,13 @@ def delete_comment():
     # post error handlr bool
     post = True
     try:
-        callback = request.form.get('callback')
         addr = request.form.get('addr')
     except:
         post = False
-        callback = url_for('feeds')
     if post == True:
         ctrl.DeletePost(addr)
 
-    return redirect(callback)
+    return redirect(url_for('profile',zid=session['zid']))
 
 
 
@@ -94,15 +88,13 @@ def new_comment():
     post = True
     try:
         parent = request.form.get('parent')
-        callback = request.form.get('callback')
         content = request.form.get('content')
         zid = session['zid']
     except:
         post = False
-        callback = url_for('feeds')
     if post == True:
         ctrl.MakeCommentPost(parent, content, zid)
-    return redirect(callback)
+    return redirect(url_for('profile',zid=session['zid']))
 
 # POST ROUTE
 @app.route('/post', methods=['POST', 'GET'])
@@ -112,7 +104,7 @@ def new_post():
         return redirect(url_for('login'))
 
     ctrl.MakePost(request.form.get('post_content'), session['zid'])
-    return redirect(request.form.get('callback'))
+    return redirect(request.referrer)
 
 # FEEDS ROUTE
 @app.route('/feeds', methods=['GET','POST'])
